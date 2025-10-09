@@ -15,7 +15,7 @@
                 <nav class="header__menu">
                     <ul>
                         <li class="{{ request()->is('/') ? 'active' : '' }}"><a
-                                href="{{ route('fo.home.index') }}">Beranda</a></li>
+                                href="{{ route('fo.home.index') }}">iki Beranda</a></li>
                         <li class="{{ request()->is('about') ? 'active' : '' }}"><a
                                 href="{{ route('fo.about.index') }}">Tentang</a></li>
                         <li class="{{ request()->is('count*') ? 'active' : '' }}"><a
