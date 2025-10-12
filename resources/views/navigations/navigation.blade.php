@@ -1,6 +1,6 @@
 <div class="brand-logo d-flex align-items-center justify-content-between">
     <a href="./index.html" class="text-nowrap logo-img">
-        <img src="{{ asset('bo/images/logos/silayak-logo.png') }}" width="180" alt="" class="ms-2" />
+        <img src="{{ asset('bo/images/logos/silayak-logo2.png') }}" width="180" alt="" class="ms-2" />
     </a>
     <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
         <i class="ti ti-x fs-8"></i>

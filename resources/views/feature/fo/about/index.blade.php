@@ -22,7 +22,7 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="section-title">
-                        <h3>Tentang Sistem Klasifikasi Penerima Rusunawa</h3>
+                        <h3>Tentang Sistem Seleksi Penerima Rusunawa (ROC + SMART)</h3>
                     </div>
                 </div>
             </div>
@@ -31,67 +31,71 @@
                     <div class="blog__details__text">
                         <div class="blog__details__title">
                             <p>
-                                Ketersediaan hunian yang layak merupakan salah satu kebutuhan dasar manusia yang harus
-                                dipenuhi demi menjamin kesejahteraan hidup. Di Kota Yogyakarta, urbanisasi yang terus
-                                meningkat setiap tahunnya turut memberikan tekanan terhadap ketersediaan lahan dan hunian,
-                                khususnya bagi masyarakat berpenghasilan rendah (MBR).
+                                Ketersediaan hunian layak merupakan kebutuhan dasar. Di Kota Yogyakarta, dinamika urbanisasi
+                                menekan ketersediaan lahan dan hunian, khususnya bagi masyarakat berpenghasilan rendah (MBR).
                             </p>
                             <p>
-                                Sebagai bentuk solusi, pemerintah menyediakan Rumah Susun Sederhana Sewa (Rusunawa) untuk
-                                memenuhi kebutuhan tempat tinggal bagi warga yang belum memiliki hunian tetap. Namun
-                                demikian, proses seleksi calon penghuni Rusunawa selama ini masih bersifat manual dan
-                                administratif, yang menyulitkan dalam menentukan kelayakan secara objektif dan efisien.
+                                Pemerintah menyediakan Rumah Susun Sederhana Sewa (Rusunawa) untuk membantu warga yang belum
+                                memiliki hunian tetap. Agar seleksi calon penghuni lebih objektif dan efisien, kami
+                                mengembangkan sistem pendukung keputusan berbasis <strong>Rank Order Centroid (ROC)</strong> dan
+                                <strong>Simple Multi Attribute Rating Technique (SMART)</strong>.
                             </p>
                         </div>
 
                         <div class="blog__details__quote">
                             <p>
-                                "Sistem klasifikasi berbasis K-Nearest Neighbor (K-NN) hadir untuk membantu pemerintah dalam
-                                menyeleksi calon penghuni Rusunawa secara objektif, akurat, dan adil."
+                                “Bobot kriteria ditentukan secara <em>fair</em> dengan ROC, penilaian alternatif dihitung transparan
+                                menggunakan SMART — hasil akhirnya berupa perankingan yang mudah diaudit.”
                             </p>
                         </div>
 
                         <div class="blog__details__title__more">
                             <h4>Latar Belakang</h4>
                             <p>
-                                Permasalahan utama dalam proses seleksi penerima Rusunawa adalah belum optimalnya metode
-                                penilaian kelayakan yang digunakan. Hal ini menimbulkan risiko ketidaktepatan sasaran, di
-                                mana fasilitas Rusunawa bisa saja diberikan kepada pihak yang kurang memenuhi kriteria,
-                                sementara masyarakat yang lebih membutuhkan justru tidak terakomodasi.
-                            </p>
-                            <p>
-                                Padahal, Peraturan Walikota Yogyakarta Nomor 36 Tahun 2019 telah mengatur sejumlah indikator
-                                kelayakan seperti penghasilan dan jumlah tanggungan keluarga. Oleh karena itu, diperlukan
-                                sebuah sistem berbasis teknologi yang dapat membantu proses klasifikasi kelayakan secara
-                                sistematis, objektif, dan akurat.
+                                Tantangan utama seleksi penerima Rusunawa adalah konsistensi penilaian dan keterlacakan
+                                keputusan. Meski <em>regulasi teknis</em> telah mengarahkan indikator kelayakan, proses manual
+                                rentan subjektif dan memakan waktu. Diperlukan pendekatan terstruktur agar keputusan tepat
+                                sasaran, adil, dan dapat dipertanggungjawabkan.
                             </p>
                         </div>
 
                         <div class="blog__details__title__more">
                             <h4>Tujuan Sistem</h4>
                             <ul class="pl-5 pb-5 pt-3">
-                                <li>Menyeleksi calon penghuni Rusunawa secara objektif berdasarkan data.</li>
-                                <li>Mengurangi potensi kesalahan dan ketidaktepatan sasaran dalam pemberian hunian.</li>
-                                <li>Mempermudah pemerintah dalam proses pengambilan keputusan berbasis data.</li>
+                                <li>Menyeleksi calon penghuni Rusunawa secara objektif berbasis data.</li>
+                                <li>Mengurangi ketidaktepatan sasaran serta mempercepat proses verifikasi.</li>
+                                <li>Menyediakan perankingan transparan sebagai rekomendasi bagi pengambil keputusan.</li>
                             </ul>
                         </div>
 
                         <div class="blog__details__title__more">
                             <h4>Metodologi</h4>
                             <p>
-                                Sistem ini menggunakan algoritma <strong>K-Nearest Neighbor (K-NN)</strong>, yaitu metode
-                                dalam machine learning yang melakukan klasifikasi berdasarkan kedekatan data baru terhadap
-                                data historis. Dengan pendekatan ini, sistem dapat menentukan kelayakan calon penerima
-                                Rusunawa dengan membandingkan data yang diinput dengan data penerima terdahulu.
+                                <strong>1) Penentuan Bobot dengan ROC.</strong> Pengambil keputusan mengurutkan kriteria dari
+                                paling penting hingga kurang penting. Bobot setiap kriteria dihitung otomatis dengan rumus ROC.
+                                Pendekatan ini sederhana, konsisten, dan cocok saat hanya tersedia urutan prioritas.
                             </p>
+                            <p>
+                                <strong>2) Penilaian Alternatif dengan SMART.</strong> Setiap kriteria dibentuk fungsi nilai (utility),
+                                dilakukan normalisasi (benefit/cost), lalu dihitung skor akhir sebagai penjumlahan tertimbang:
+                                <em>skor alternatif = Σ (bobot ROC × nilai SMART)</em>. Hasilnya berupa peringkat calon penghuni.
+                            </p>
+                            <p class="mb-0"><strong>Kriteria yang digunakan:</strong></p>
+                            <ul class="pl-5 pt-2">
+                                <li>Penghasilan</li>
+                                <li>Pekerjaan</li>
+                                <li>Status Penempatan</li>
+                                <li>Status Perkawinan</li>
+                                <li>Calon Penghuni (komposisi/ketergantungan)</li>
+                            </ul>
                         </div>
 
                         <div class="blog__details__title__more">
                             <h4>Manfaat Sistem</h4>
                             <ul class="pl-5 pb-5 pt-3">
-                                <li>Memberikan rekomendasi kelayakan penerima Rusunawa secara akurat dan adil.</li>
-                                <li>Mempermudah proses verifikasi dan seleksi calon penghuni.</li>
-                                <li>Meningkatkan transparansi dan efisiensi dalam penyaluran fasilitas hunian.</li>
+                                <li>Rekomendasi penerima yang akurat, adil, dan mudah diaudit.</li>
+                                <li>Proses seleksi lebih cepat dan terdokumentasi.</li>
+                                <li>Meningkatkan transparansi dan akuntabilitas penyaluran fasilitas hunian.</li>
                             </ul>
                         </div>
 
@@ -100,13 +104,13 @@
                                 <img src="{{ asset('fo/img/rusun.jpeg') }}" alt="Ilustrasi Rusunawa">
                             </div>
                         </div>
+
                         <div class="blog__details__item">
                             <div class="blog__details__item__text">
                                 <p>
-                                    Dengan sistem klasifikasi ini, diharapkan proses seleksi calon penghuni Rusunawa dapat
-                                    dilakukan secara lebih adil, transparan, dan berbasis data yang kuat. Hal ini akan
-                                    mendukung program pemerintah dalam menyediakan hunian yang layak bagi masyarakat yang
-                                    benar-benar membutuhkan.
+                                    Dengan pendekatan ROC + SMART, proses seleksi calon penghuni Rusunawa menjadi lebih
+                                    terstruktur, terukur, dan berkeadilan—mendukung misi menyediakan hunian layak bagi
+                                    masyarakat yang benar-benar membutuhkan.
                                 </p>
                             </div>
                         </div>
@@ -114,14 +118,12 @@
                         <div class="blog__details__desc pt-5">
                             <h4>Penutup</h4>
                             <p>
-                                Kami berharap bahwa sistem klasifikasi berbasis K-NN ini dapat menjadi solusi dalam
-                                penyaluran bantuan hunian Rusunawa yang lebih tepat sasaran. Dengan inovasi berbasis
-                                teknologi, penyaluran fasilitas publik dapat menjadi lebih efisien dan berdampak nyata bagi
-                                masyarakat Kota Yogyakarta.
+                                Kami berharap sistem ini menjadi referensi yang kuat dalam pengambilan keputusan penerima
+                                Rusunawa. Saran dan masukan sangat kami nantikan demi penyempurnaan berkelanjutan.
                             </p>
                             <p>
-                                Untuk pertanyaan lebih lanjut atau saran terkait aplikasi ini, silakan kunjungi halaman <a
-                                    href="{{ route('fo.ourteam.index') }}">kontak</a> kami.
+                                Untuk pertanyaan lebih lanjut atau kolaborasi, silakan kunjungi halaman
+                                <a href="{{ route('fo.ourteam.index') }}">kontak</a> kami.
                             </p>
                         </div>
                     </div>
