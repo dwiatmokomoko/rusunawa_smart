@@ -24,29 +24,39 @@ class CriteriaController extends Controller
     {
         if ($request->ajax()) {
             try {
-                $data = $this->repository->getAll();
-                // dd($data->toArray());
+                $data = $this->repository->getAll(); // pastikan ini return Eloquent Builder/Collection
             } catch (Exception $e) {
-                dd($e);
+                // sementara tampilkan pesan jelas di log, bukan dd (dd bikin 500 HTML)
+                report($e);
+                return response()->json(['data' => [], 'error' => 'Server error'], 500);
             }
+
             return DataTables::of($data)
                 ->addIndexColumn()
-                ->editColumn("weight", function ($row) {
-                    return $row->weight . " %";
+                // kirim angka murni, tanpa '%'
+                ->editColumn('weight', function ($row) {
+                    return (int) $row->weight;
                 })
                 ->addColumn('action', function ($row) {
-                    $btn = '<form class="d-flex justify-content-center" method="POST" action="' . route('criteria.destroy', encrypt($row["id"])) . '">
-                                        ' . method_field("DELETE") . '
-                                        ' . csrf_field() . '
-                                        <a href="' . route("criteria.edit", encrypt($row["id"])) . '" class=" btn btn-outline-warning m-1 btn-tooltip"><i class="ti ti-edit"></i></a>
-                                        <button type="button" id="deleteRow" data-message="' . $row["name"] . '" class=" btn btn-outline-danger m-1 show-alert-delete-box" data-toggle="tooltip" title="Delete"><i class="ti ti-trash"></i></button>
-                                    </form>';
+                    $idEnc = encrypt($row->id); // pakai object access
+                    $name = e($row->name);
+
+                    $btn = '<form class="d-flex justify-content-center" method="POST" action="' . route('criteria.destroy', $idEnc) . '">';
+                    $btn .= method_field('DELETE') . csrf_field();
+                    $btn .= '<a href="' . route('criteria.edit', $idEnc) . '" class="btn btn-outline-warning m-1 btn-tooltip"><i class="ti ti-edit"></i></a>';
+                    $btn .= '<button type="button" id="deleteRow" data-message="' . $name . '" class="btn btn-outline-danger m-1 show-alert-delete-box" title="Delete"><i class="ti ti-trash"></i></button>';
+                    $btn .= '</form>';
+
                     return $btn;
                 })
                 ->rawColumns(['action'])
                 ->make(true);
         }
+
+        // optional: kalau ada akses langsung non-AJAX
+        abort(404);
     }
+
 
     /**
      * Display a listing of the resource.
