@@ -54,10 +54,15 @@
                 processing: true,
                 serverSide: true,
                 ajax: "{{ route('criterias.data') }}",
+                order: [
+                    [1, 'asc']
+                ], // <- urutkan default ke kolom 'name' (index 1)
                 columns: [{
                         data: 'DT_RowIndex',
-                        name: 'DT_RowIndex'
-                    },
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
+                    }, // <- non-sort
                     {
                         data: 'name',
                         name: 'name'
@@ -65,8 +70,9 @@
                     {
                         data: 'weight',
                         name: 'weight',
-                        render: function(data, type, row) {
-                            switch (parseInt(data)) {
+                        render: function(data) {
+                            const w = parseInt(data, 10);
+                            switch (w) {
                                 case 20:
                                     return 5;
                                 case 16:
@@ -78,7 +84,7 @@
                                 case 4:
                                     return 1;
                                 default:
-                                    return data; // fallback jika nilainya di luar ketentuan
+                                    return w;
                             }
                         }
                     },
@@ -90,21 +96,21 @@
                     }
                 ],
                 columnDefs: [{
-                        "targets": 0,
-                        "className": "text-center align-middle text-sm font-weight-normal",
-                        "width": "4%"
+                        targets: 0,
+                        className: "text-center align-middle text-sm font-weight-normal",
+                        width: "4%"
                     },
                     {
-                        "targets": 1,
-                        "className": "ps-3 pt-0 pb-0 align-middle text-sm font-weight-normal",
+                        targets: 1,
+                        className: "ps-3 pt-0 pb-0 align-middle text-sm font-weight-normal"
                     },
                     {
-                        "targets": 2,
-                        "className": "ps-3 pt-0 pb-0 align-middle text-sm font-weight-normal",
+                        targets: 2,
+                        className: "ps-3 pt-0 pb-0 align-middle text-sm font-weight-normal"
                     },
                     {
-                        "targets": 3,
-                        "className": "align-middle text-sm font-weight-normal",
+                        targets: 3,
+                        className: "align-middle text-sm font-weight-normal"
                     }
                 ]
             });

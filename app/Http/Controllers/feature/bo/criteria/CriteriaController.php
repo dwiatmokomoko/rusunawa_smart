@@ -20,42 +20,42 @@ class CriteriaController extends Controller
         $this->repository = $repository;
     }
 
-    function datas(Request $request)
+    public function datas(Request $request)
     {
         if ($request->ajax()) {
             try {
-                $data = $this->repository->getAll(); // pastikan ini return Eloquent Builder/Collection
-            } catch (Exception $e) {
-                // sementara tampilkan pesan jelas di log, bukan dd (dd bikin 500 HTML)
+                // Idealnya repository mengembalikan Eloquent\Builder untuk server-side paging/filter
+                $query = $this->repository->getAllQuery() ?? $this->repository->getAll();
+            } catch (\Throwable $e) {
                 report($e);
                 return response()->json(['data' => [], 'error' => 'Server error'], 500);
             }
 
-            return DataTables::of($data)
+            // Jika $query adalah Builder -> pakai eloquent(); jika Collection -> pakai of()
+            $dt = $query instanceof \Illuminate\Database\Eloquent\Builder
+                ? \Yajra\DataTables\Facades\DataTables::eloquent($query)
+                : \Yajra\DataTables\Facades\DataTables::of($query);
+
+            return $dt
                 ->addIndexColumn()
-                // kirim angka murni, tanpa '%'
-                ->editColumn('weight', function ($row) {
-                    return (int) $row->weight;
-                })
+                // kirim angka murni, biar mapping ROC kamu di JS tetap simple
+                ->editColumn('weight', fn($row) => (int) $row->weight)
                 ->addColumn('action', function ($row) {
-                    $idEnc = encrypt($row->id); // pakai object access
-                    $name = e($row->name);
-
-                    $btn = '<form class="d-flex justify-content-center" method="POST" action="' . route('criteria.destroy', $idEnc) . '">';
-                    $btn .= method_field('DELETE') . csrf_field();
-                    $btn .= '<a href="' . route('criteria.edit', $idEnc) . '" class="btn btn-outline-warning m-1 btn-tooltip"><i class="ti ti-edit"></i></a>';
-                    $btn .= '<button type="button" id="deleteRow" data-message="' . $name . '" class="btn btn-outline-danger m-1 show-alert-delete-box" title="Delete"><i class="ti ti-trash"></i></button>';
-                    $btn .= '</form>';
-
-                    return $btn;
+                    $idEnc = encrypt($row->id);       // <= object access
+                    $name = e($row->name);           // <= object access + escape
+                    return '<form class="d-flex justify-content-center" method="POST" action="' . route('criteria.destroy', $idEnc) . '">'
+                        . method_field('DELETE') . csrf_field()
+                        . '<a href="' . route('criteria.edit', $idEnc) . '" class="btn btn-outline-warning m-1 btn-tooltip"><i class="ti ti-edit"></i></a>'
+                        . '<button type="button" id="deleteRow" data-message="' . $name . '" class="btn btn-outline-danger m-1 show-alert-delete-box" title="Delete"><i class="ti ti-trash"></i></button>'
+                        . '</form>';
                 })
                 ->rawColumns(['action'])
-                ->make(true);
+                ->toJson();
         }
 
-        // optional: kalau ada akses langsung non-AJAX
         abort(404);
     }
+
 
 
     /**
