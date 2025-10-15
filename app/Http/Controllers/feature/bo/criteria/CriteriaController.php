@@ -7,6 +7,7 @@ use App\Repositories\CriteriaRepository;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Criteria;
 use Yajra\DataTables\Facades\DataTables;
 
 class CriteriaController extends Controller
@@ -22,40 +23,27 @@ class CriteriaController extends Controller
 
     public function datas(Request $request)
     {
-        if ($request->ajax()) {
-            try {
-                // Idealnya repository mengembalikan Eloquent\Builder untuk server-side paging/filter
-                $query = $this->repository->getAllQuery() ?? $this->repository->getAll();
-            } catch (\Throwable $e) {
-                report($e);
-                return response()->json(['data' => [], 'error' => 'Server error'], 500);
-            }
+        abort_unless($request->ajax(), 404);
 
-            // Jika $query adalah Builder -> pakai eloquent(); jika Collection -> pakai of()
-            $dt = $query instanceof \Illuminate\Database\Eloquent\Builder
-                ? \Yajra\DataTables\Facades\DataTables::eloquent($query)
-                : \Yajra\DataTables\Facades\DataTables::of($query);
+        // Builder, bukan collection
+        $query = Criteria::query()->select(['id', 'name', 'weight']);
 
-            return $dt
-                ->addIndexColumn()
-                // kirim angka murni, biar mapping ROC kamu di JS tetap simple
-                ->editColumn('weight', fn($row) => (int) $row->weight)
-                ->addColumn('action', function ($row) {
-                    $idEnc = encrypt($row->id);       // <= object access
-                    $name = e($row->name);           // <= object access + escape
-                    return '<form class="d-flex justify-content-center" method="POST" action="' . route('criteria.destroy', $idEnc) . '">'
-                        . method_field('DELETE') . csrf_field()
-                        . '<a href="' . route('criteria.edit', $idEnc) . '" class="btn btn-outline-warning m-1 btn-tooltip"><i class="ti ti-edit"></i></a>'
-                        . '<button type="button" id="deleteRow" data-message="' . $name . '" class="btn btn-outline-danger m-1 show-alert-delete-box" title="Delete"><i class="ti ti-trash"></i></button>'
-                        . '</form>';
-                })
-                ->rawColumns(['action'])
-                ->toJson();
-        }
-
-        abort(404);
+        return DataTables::eloquent($query)
+            ->addIndexColumn()                       // DT_RowIndex (virtual)
+            ->orderColumn('DT_RowIndex', 'id $1')    // kalau user klik kolom index, map ke id
+            ->editColumn('weight', fn($r) => (int) $r->weight) // kirim angka murni
+            ->addColumn('action', function ($r) {
+                $idEnc = encrypt($r->id);
+                $name = e($r->name);
+                return '<form class="d-flex justify-content-center" method="POST" action="' . route('criteria.destroy', $idEnc) . '">'
+                    . method_field('DELETE') . csrf_field()
+                    . '<a href="' . route('criteria.edit', $idEnc) . '" class="btn btn-outline-warning m-1"><i class="ti ti-edit"></i></a>'
+                    . '<button type="button" id="deleteRow" data-message="' . $name . '" class="btn btn-outline-danger m-1"><i class="ti ti-trash"></i></button>'
+                    . '</form>';
+            })
+            ->rawColumns(['action'])
+            ->toJson();
     }
-
 
 
     /**

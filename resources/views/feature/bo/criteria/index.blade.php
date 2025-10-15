@@ -45,24 +45,18 @@
     <script type="text/javascript">
         $(function() {
             var table = $('.criteria_table').DataTable({
-                language: {
-                    paginate: {
-                        next: "›",
-                        previous: "‹"
-                    }
-                },
                 processing: true,
                 serverSide: true,
                 ajax: "{{ route('criterias.data') }}",
                 order: [
                     [1, 'asc']
-                ], // <- urutkan default ke kolom 'name' (index 1)
+                ], // urut by name
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
                         orderable: false,
                         searchable: false
-                    }, // <- non-sort
+                    },
                     {
                         data: 'name',
                         name: 'name'
@@ -93,24 +87,6 @@
                         name: 'action',
                         orderable: false,
                         searchable: false
-                    }
-                ],
-                columnDefs: [{
-                        targets: 0,
-                        className: "text-center align-middle text-sm font-weight-normal",
-                        width: "4%"
-                    },
-                    {
-                        targets: 1,
-                        className: "ps-3 pt-0 pb-0 align-middle text-sm font-weight-normal"
-                    },
-                    {
-                        targets: 2,
-                        className: "ps-3 pt-0 pb-0 align-middle text-sm font-weight-normal"
-                    },
-                    {
-                        targets: 3,
-                        className: "align-middle text-sm font-weight-normal"
                     }
                 ]
             });

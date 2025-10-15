@@ -18,7 +18,7 @@ class CriteriaRepository implements CriteriaInterface
     // App\Repositories\CriteriaRepository.php
     public function getAllQuery()
     {
-        return Criteria::query()->select('id', 'name', 'weight');
+        return \App\Models\Criteria::query()->select(['id', 'name', 'weight']);
     }
 
     public function getAll()
