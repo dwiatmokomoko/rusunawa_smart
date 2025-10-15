@@ -9,6 +9,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\DB;
 
 class SubCriteriaController extends Controller
 {
@@ -25,70 +26,36 @@ class SubCriteriaController extends Controller
 
     function datas(Request $request)
     {
-        if ($request->ajax()) {
-            try {
-                $data = $this->repository->getAll();
-                // dd($data);
-            } catch (Exception $e) {
-                dd($e);
-            }
-            return DataTables::of($data)
-                ->addIndexColumn()
-                ->editColumn("weight", function ($row) {
-                    $w = $row->weight;
-                    $code = $row->criteria->id ?? null;
+        abort_unless($request->ajax(), 404);
 
-                    if (!$code)
-                        return $w . ' %';
+        // Pakai JOIN supaya bisa sort/search criteria_name di server-side
+        $qb = DB::table('sub_criterias')
+            ->leftJoin('criterias', 'criterias.id', '=', 'sub_criterias.criteria_id')
+            ->select([
+                'sub_criterias.id',
+                'sub_criterias.criteria_id',
+                'sub_criterias.name',
+                'sub_criterias.weight',
+                'criterias.name as criteria_name',
+            ]);
 
-                    switch ($code) {
-                        // case '1':
-                        // case '2':
-                        //     return $w == 100 ? '1' : '0';
-                        case '1':
-                            return $w == 100 ? '3' : ($w == 33 ? '1' : '');
-                        case '2':
-                            return match ($w) {
-                                100 => '4',
-                                75 => '3',
-                                50 => '2',
-                                25 => '1',
-                                default => '0',
-                            };
-                        case '3':
-                            return $w == 100 ? '3' : ($w == 33 ? '1' : '');
-                        case '4':
-                            return match ($w) {
-                                25 => '1',
-                                50 => '2',
-                                75 => '3',
-                                100 => '4',
-                                default => '0',
-                            };
-                        case '5':
-                            return match ($w) {
-                                33 => '1',
-                                100 => '3',
-                                67 => '2',
-                                default => '0',
-                            };
-                        default:
-                            return $w . ' %';
-                    }
-                })
+        return DataTables::queryBuilder($qb)
+            ->addIndexColumn() // DT_RowIndex (virtual)
+            ->orderColumn('DT_RowIndex', 'sub_criterias.id $1') // kalau user klik kolom No
+            ->editColumn('weight', fn($row) => (int) $row->weight) // kirim angka murni
+            ->addColumn('action', function ($row) {
+                // $row adalah stdClass (query builder), akses pakai -> (bukan array)
+                $idEnc = encrypt($row->id);
+                $name = e($row->name);
 
-                ->addColumn('action', function ($row) {
-                    $btn = '<form class="d-flex justify-content-center" method="POST" action="' . route('sub-criteria.destroy', encrypt($row["id"])) . '">
-                                        ' . method_field("DELETE") . '
-                                        ' . csrf_field() . '
-                                        <a href="' . route("sub-criteria.edit", encrypt($row["id"])) . '" class=" btn btn-outline-warning m-1 btn-tooltip"><i class="ti ti-edit"></i></a>
-                                        <button type="button" id="deleteRow" data-message="' . $row["name"] . '" class=" btn btn-outline-danger m-1 show-alert-delete-box" data-toggle="tooltip" title="Delete"><i class="ti ti-trash"></i></button>
-                                    </form>';
-                    return $btn;
-                })
-                ->rawColumns(['action'])
-                ->make(true);
-        }
+                return '<form class="d-flex justify-content-center" method="POST" action="' . route('sub-criteria.destroy', $idEnc) . '">'
+                    . method_field('DELETE') . csrf_field()
+                    . '<a href="' . route('sub-criteria.edit', $idEnc) . '" class="btn btn-outline-warning m-1"><i class="ti ti-edit"></i></a>'
+                    . '<button type="button" id="deleteRow" data-message="' . $name . '" class="btn btn-outline-danger m-1"><i class="ti ti-trash"></i></button>'
+                    . '</form>';
+            })
+            ->rawColumns(['action'])
+            ->toJson();
     }
 
     /**
@@ -161,7 +128,7 @@ class SubCriteriaController extends Controller
                     };
                     break;
                 case '3':
-                   $data["weight"] = match ($inputWeight) {
+                    $data["weight"] = match ($inputWeight) {
                         1 => 33,
                         3 => 100,
                         default => 0,
