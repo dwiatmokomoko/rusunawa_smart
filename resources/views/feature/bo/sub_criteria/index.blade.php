@@ -56,14 +56,15 @@
                 processing: true,
                 serverSide: true,
 
-                // penting: pakai URL relatif agar tidak mixed-content
+                // URL relatif -> aman dari mixed-content
                 ajax: "{{ route('sub-criterias.data', [], false) }}",
 
-                // urutkan default berdasarkan nama kriteria, lalu sub kriteria
+                // urut default: Kriteria, lalu Sub Kriteria
                 order: [
                     [1, 'asc'],
                     [2, 'asc']
                 ],
+
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
@@ -73,7 +74,7 @@
                     {
                         data: 'criteria_name',
                         name: 'criteria_name'
-                    }, // <- dari JOIN
+                    }, // dari JOIN (alias)
                     {
                         data: 'name',
                         name: 'sub_criterias.name'
@@ -81,7 +82,32 @@
                     {
                         data: 'weight',
                         name: 'sub_criterias.weight',
-                        render: /* mapping skor */
+                        render: function(data, type, row) {
+                            // data = persen (0/25/33/50/67/75/100)
+                            // row.criteria_id = id kriteria (1..5)
+                            var w = parseInt(data, 10);
+                            switch (row.criteria_id) {
+                                case 2: // skala 1..4
+                                case 4:
+                                    if (w === 25) return 1;
+                                    if (w === 50) return 2;
+                                    if (w === 75) return 3;
+                                    if (w === 100) return 4;
+                                    return 0;
+                                case 1: // skala 1 atau 3
+                                case 3:
+                                    if (w === 33) return 1;
+                                    if (w === 100) return 3;
+                                    return 0;
+                                case 5: // skala 1..3
+                                    if (w === 33) return 1;
+                                    if (w === 67) return 2;
+                                    if (w === 100) return 3;
+                                    return 0;
+                                default:
+                                    return w; // fallback: tampilkan persen mentah
+                            }
+                        }
                     },
                     {
                         data: 'action',
@@ -89,7 +115,7 @@
                         orderable: false,
                         searchable: false
                     }
-                ]
+                ], // <--- PENTING: ada koma penutup di sini!
 
                 columnDefs: [{
                         targets: 0,
