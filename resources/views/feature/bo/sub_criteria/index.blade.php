@@ -64,7 +64,6 @@
                     [1, 'asc'],
                     [2, 'asc']
                 ],
-
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
@@ -74,7 +73,7 @@
                     {
                         data: 'criteria_name',
                         name: 'criteria_name'
-                    }, // <-- hasil join
+                    }, // <- dari JOIN
                     {
                         data: 'name',
                         name: 'sub_criterias.name'
@@ -82,31 +81,7 @@
                     {
                         data: 'weight',
                         name: 'sub_criterias.weight',
-                        render: function(data, type, row) {
-                            // data = persen (0/25/33/50/67/75/100). Kalau ingin tampil skor 1..4/1..3, map di sini:
-                            const w = parseInt(data, 10);
-                            switch (row.criteria_id) {
-                                case 2: // contoh mapping skala 1..4
-                                case 4:
-                                    if (w === 25) return 1;
-                                    if (w === 50) return 2;
-                                    if (w === 75) return 3;
-                                    if (w === 100) return 4;
-                                    return 0;
-                                case 1: // contoh mapping 1 atau 3
-                                case 3:
-                                    if (w === 33) return 1;
-                                    if (w === 100) return 3;
-                                    return 0;
-                                case 5: // contoh mapping 1..3
-                                    if (w === 33) return 1;
-                                    if (w === 67) return 2;
-                                    if (w === 100) return 3;
-                                    return 0;
-                                default:
-                                    return w; // fallback: tampilkan persen mentah
-                            }
-                        }
+                        render: /* mapping skor */
                     },
                     {
                         data: 'action',
@@ -114,7 +89,7 @@
                         orderable: false,
                         searchable: false
                     }
-                ],
+                ]
 
                 columnDefs: [{
                         targets: 0,

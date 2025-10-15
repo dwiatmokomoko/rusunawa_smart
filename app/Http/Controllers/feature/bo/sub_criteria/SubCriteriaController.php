@@ -8,8 +8,8 @@ use App\Repositories\SubCriteriaRepository;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\DB;
+use Yajra\DataTables\Facades\DataTables;
 
 class SubCriteriaController extends Controller
 {
@@ -24,11 +24,11 @@ class SubCriteriaController extends Controller
         $this->criteria_repository = $criteria_repository;
     }
 
-    function datas(Request $request)
+    public function datas(Request $request)
     {
         abort_unless($request->ajax(), 404);
 
-        // Pakai JOIN supaya bisa sort/search criteria_name di server-side
+        // JOIN supaya bisa sort/search di server untuk nama kriteria
         $qb = DB::table('sub_criterias')
             ->leftJoin('criterias', 'criterias.id', '=', 'sub_criterias.criteria_id')
             ->select([
@@ -39,15 +39,13 @@ class SubCriteriaController extends Controller
                 'criterias.name as criteria_name',
             ]);
 
-        return DataTables::queryBuilder($qb)
-            ->addIndexColumn() // DT_RowIndex (virtual)
+        return DataTables::of($qb) // <-- ganti dari queryBuilder() ke of()
+            ->addIndexColumn()                         // DT_RowIndex (virtual)
             ->orderColumn('DT_RowIndex', 'sub_criterias.id $1') // kalau user klik kolom No
             ->editColumn('weight', fn($row) => (int) $row->weight) // kirim angka murni
             ->addColumn('action', function ($row) {
-                // $row adalah stdClass (query builder), akses pakai -> (bukan array)
                 $idEnc = encrypt($row->id);
                 $name = e($row->name);
-
                 return '<form class="d-flex justify-content-center" method="POST" action="' . route('sub-criteria.destroy', $idEnc) . '">'
                     . method_field('DELETE') . csrf_field()
                     . '<a href="' . route('sub-criteria.edit', $idEnc) . '" class="btn btn-outline-warning m-1"><i class="ti ti-edit"></i></a>'
