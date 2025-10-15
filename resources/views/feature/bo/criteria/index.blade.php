@@ -47,7 +47,7 @@
             var table = $('.criteria_table').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('criterias.data') }}",
+                ajax: "{{ url('/admin/criterias') }}",
                 order: [
                     [1, 'asc']
                 ], // urut by name
