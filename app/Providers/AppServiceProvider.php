@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,8 +21,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // RedirectIfAuthenticated::redirectUsing(function () {
-        //     return route('admin.home');
-        // });
+         if (app()->environment() !== 'local') {
+        URL::forceScheme('https');
+    }
     }
 }
